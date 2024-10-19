@@ -1,13 +1,13 @@
 alpine_url=http://dl-cdn.alpinelinux.org/alpine/v3.20
 
-tools_tar=apk-tools-static-2.14.4-r0.apk
+tools_tar=apk-tools-static-2.14.4-r1.apk
 tools_url=$alpine_url/main/armv7/$tools_tar
 
-firmware_tar=linux-firmware-other-20240513-r0.apk
+firmware_tar=linux-firmware-other-20240811-r0.apk
 firmware_url=$alpine_url/main/armv7/$firmware_tar
 
 linux_dir=tmp/linux-6.6
-linux_ver=6.6.32-xilinx
+linux_ver=6.6.44-xilinx
 
 modules_dir=alpine-modloop/lib/modules/$linux_ver
 
@@ -17,7 +17,7 @@ test -f $tools_tar || curl -L $tools_url -o $tools_tar
 
 test -f $firmware_tar || curl -L $firmware_url -o $firmware_tar
 
-for tar in linux-firmware-ath9k_htc-20240513-r0.apk linux-firmware-brcm-20240513-r0.apk linux-firmware-cypress-20240513-r0.apk linux-firmware-rtlwifi-20240513-r0.apk
+for tar in linux-firmware-ath9k_htc-20240811-r0.apk linux-firmware-brcm-20240811-r0.apk linux-firmware-cypress-20240811-r0.apk linux-firmware-rtlwifi-20240811-r0.apk
 do
   url=$alpine_url/main/armv7/$tar
   test -f $tar || curl -L $url -o $tar
@@ -36,7 +36,7 @@ depmod -a -b alpine-modloop $linux_ver
 
 tar -zxf $firmware_tar --directory=alpine-modloop/lib/modules --warning=no-unknown-keyword --strip-components=1 --wildcards lib/firmware/ar* lib/firmware/rt*
 
-for tar in linux-firmware-ath9k_htc-20240513-r0.apk linux-firmware-brcm-20240513-r0.apk linux-firmware-cypress-20240513-r0.apk linux-firmware-rtlwifi-20240513-r0.apk
+for tar in linux-firmware-ath9k_htc-20240811-r0.apk linux-firmware-brcm-20240811-r0.apk linux-firmware-cypress-20240811-r0.apk linux-firmware-rtlwifi-20240811-r0.apk
 do
   tar -zxf $tar --directory=alpine-modloop/lib/modules --warning=no-unknown-keyword --strip-components=1
 done
@@ -60,7 +60,7 @@ ln -s /media/mmcblk0p1/cache $root_dir/etc/apk/cache
 cp -r alpine/etc $root_dir/
 cp -r alpine/apps $root_dir/media/mmcblk0p1/
 
-projects="common_tools led_blinker_77_76 sdr_receiver_77_76 sdr_receiver_hpsdr_77_76"
+projects="common_tools sdr_receiver_122_88 sdr_receiver_ft8_122_88"
 
 for p in $projects
 do
@@ -80,7 +80,7 @@ echo $alpine_url/community >> $root_dir/etc/apk/repositories
 chroot $root_dir /bin/sh <<- EOF_CHROOT
 
 apk update
-apk add openssh ucspi-tcp6 iw wpa_supplicant dhcpcd dnsmasq hostapd iptables avahi dbus dcron chrony gpsd musl-dev libconfig-dev alsa-lib-dev alsa-utils curl wget less nano bc dos2unix screen
+apk add openssh ucspi-tcp6 iw wpa_supplicant dhcpcd dnsmasq hostapd iptables avahi dbus dcron chrony gpsd libgfortran musl-dev libconfig-dev alsa-lib-dev alsa-utils curl wget less nano bc dos2unix screen
 
 rc-update add bootmisc boot
 rc-update add hostname boot
@@ -119,7 +119,7 @@ sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' etc/ssh/sshd_config
 
 echo root:$passwd | chpasswd
 
-hostname qmtech-xc7z020
+hostname hellofpga-smartzynq
 
 sed -i 's/^# LBU_MEDIA=.*/LBU_MEDIA=mmcblk0p1/' etc/lbu/lbu.conf
 
@@ -133,11 +133,33 @@ ln -s /media/mmcblk0p1/wifi root/wifi
 
 lbu add root
 lbu delete etc/resolv.conf
+lbu delete etc/cron.d/ft8_122_88
+lbu delete etc/cron.d/wspr_122_88
 lbu delete root/.ash_history
 
 lbu commit -d
 
-apk add make gcc linux-headers
+apk add make gcc gfortran linux-headers
+
+ft8d_dir=/media/mmcblk0p1/apps/ft8d
+ft8d_tar=/media/mmcblk0p1/apps/ft8d.tar.gz
+ft8d_url=https://github.com/pavel-demin/ft8d/archive/master.tar.gz
+
+curl -L \$ft8d_url -o \$ft8d_tar
+mkdir -p \$ft8d_dir
+tar -zxf \$ft8d_tar --strip-components=1 --directory=\$ft8d_dir
+rm \$ft8d_tar
+make -C \$ft8d_dir
+
+wsprd_dir=/media/mmcblk0p1/apps/wsprd
+wsprd_tar=/media/mmcblk0p1/apps/wsprd.tar.gz
+wsprd_url=https://github.com/pavel-demin/wsprd/archive/master.tar.gz
+
+curl -L \$wsprd_url -o \$wsprd_tar
+mkdir -p \$wsprd_dir
+tar -zxf \$wsprd_tar --strip-components=1 --directory=\$wsprd_dir
+rm \$wsprd_tar
+make -C \$wsprd_dir
 
 for p in server $projects
 do
@@ -149,7 +171,7 @@ EOF_CHROOT
 
 cp -r $root_dir/media/mmcblk0p1/apps .
 cp -r $root_dir/media/mmcblk0p1/cache .
-cp $root_dir/media/mmcblk0p1/qmtech-xc7z020.apkovl.tar.gz .
+cp $root_dir/media/mmcblk0p1/hellofpga-smartzynq.apkovl.tar.gz .
 
 cp -r alpine/wifi .
 
@@ -157,6 +179,6 @@ hostname -F /etc/hostname
 
 rm -rf $root_dir alpine-apk
 
-zip -r qmtech-xc7z020-alpine-3.20-armv7-`date +%Y%m%d`.zip apps boot.bin cache mac.txt modloop qmtech-xc7z020.apkovl.tar.gz wifi
+zip -r hellofpga-smartzynq-alpine-3.20-armv7-`date +%Y%m%d`.zip apps boot.bin cache mac.txt modloop hellofpga-smartzynq.apkovl.tar.gz wifi
 
-rm -rf apps cache modloop qmtech-xc7z020.apkovl.tar.gz wifi
+rm -rf apps cache modloop hellofpga-smartzynq.apkovl.tar.gz wifi

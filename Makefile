@@ -27,7 +27,7 @@ LINUX_TAR = tmp/linux-$(LINUX_TAG).tar.xz
 DTREE_TAR = tmp/device-tree-xlnx-$(DTREE_TAG).tar.gz
 
 INITRAMFS_URL = https://dl-cdn.alpinelinux.org/alpine/v$(INITRAMFS_TAG)/releases/armv7/netboot/initramfs-lts
-LINUX_URL = https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-$(LINUX_TAG).32.tar.xz
+LINUX_URL = https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-$(LINUX_TAG).44.tar.xz
 DTREE_URL = https://github.com/Xilinx/device-tree-xlnx/archive/$(DTREE_TAG).tar.gz
 
 SSBL_URL = https://github.com/pavel-demin/ssbl/releases/latest/download/ssbl.elf
@@ -92,8 +92,10 @@ initrd.bin: $(INITRAMFS_DIR)
 	cd $< && find . | sort | cpio -o -H newc | gzip -9 -n > ../../$@
 	truncate -s 4M $@
 
-boot.bin: tmp/$(NAME).fsbl/executable.elf tmp/ssbl.elf initrd.dtb zImage.bin initrd.bin
-	echo "img:{[bootloader] tmp/$(NAME).fsbl/executable.elf tmp/ssbl.elf [load=0x2000000] initrd.dtb [load=0x2008000] zImage.bin [load=0x3000000] initrd.bin}" > tmp/boot.bif
+boot.bin: tmp/$(NAME).fsbl/executable.elf tmp/ssbl.elf initrd.dtb zImage.bin initrd.bin bit
+	#SmartZynq board has UART and Ethernet via EMIO, so we need an initial bitstream in the boot.bin
+	#echo "img:{[bootloader] tmp/$(NAME).fsbl/executable.elf tmp/ssbl.elf [load=0x2000000] initrd.dtb [load=0x2008000] zImage.bin [load=0x3000000] initrd.bin}" > tmp/boot.bif
+	echo "img:{[bootloader] tmp/$(NAME).fsbl/executable.elf tmp/$(NAME).bit tmp/ssbl.elf [load=0x2000000] initrd.dtb [load=0x2008000] zImage.bin [load=0x3000000] initrd.bin}" > tmp/boot.bif
 	bootgen -image tmp/boot.bif -w -o $@
 
 initrd.dtb: tmp/$(NAME).tree/system-top.dts

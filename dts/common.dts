@@ -15,9 +15,17 @@
 
 &gem0 {
   phy-handle = <&ethernet_phy>;
-  ethernet_phy: ethernet-phy@1 {
-    reg = <1>;
-  };
+	ps7_ethernet_0_mdio: mdio {
+  		ethernet_phy: phy@1 {
+		  device_type = "ethernet-phy";
+  		  reg = <1>;
+  		};
+		gmii_to_rgmii_0: gmii_to_rgmii_0@8 {
+			compatible = "xlnx,gmii-to-rgmii-1.0";
+			phy-handle = <&ethernet_phy>;
+			reg = <8>;
+		};
+	};
 };
 
 &usb0 {

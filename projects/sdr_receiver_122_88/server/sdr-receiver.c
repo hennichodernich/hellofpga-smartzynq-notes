@@ -20,7 +20,8 @@ struct control
   int32_t freq[8];
 };
 
-const int rates[4] = {648, 324, 162, 81};
+//const int rates[4] = {648, 324, 162, 81};
+const int rates[4] = {1280, 640, 320, 160};
 
 int interrupted = 0;
 
@@ -115,7 +116,8 @@ int main(int argc, char *argv[])
     *rx_rate = 648;
     for(i = 0; i < 8; ++i)
     {
-      rx_freq[i] = (uint32_t)floor(1000000 / 77.76e6 * 0xffffffff + 0.5);
+      //rx_freq[i] = (uint32_t)floor(1000000 / 77.76e6 * 0xffffffff + 0.5);
+      rx_freq[i] = (uint32_t)floor(1000000 / 122.88e6 * 0xffffffff + 0.5);
     }
 
     if((sock_client = accept(sock_server, NULL, NULL)) < 0)
@@ -142,7 +144,8 @@ int main(int argc, char *argv[])
         /* set rx phase increments */
         for(i = 0; i < 8; ++i)
         {
-          rx_freq[i] = (uint32_t)floor(modf(ctrl.freq[i] / 77.76e6, &integral) * 0xffffffff + 0.5);
+          //rx_freq[i] = (uint32_t)floor(modf(ctrl.freq[i] / 77.76e6, &integral) * 0xffffffff + 0.5);
+          rx_freq[i] = (uint32_t)floor(modf(ctrl.freq[i] / 122.88e6, &integral) * 0xffffffff + 0.5);
         }
       }
 
