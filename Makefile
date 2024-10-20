@@ -4,7 +4,7 @@
 # You need to set NAME, PART and PROC for your project.
 # NAME is the base name for most of the generated files.
 
-NAME = led_blinker
+NAME = led_blinker_122_88
 PART = xc7z020clg484-1
 PROC = ps7_cortexa9_0
 

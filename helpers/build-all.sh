@@ -4,9 +4,9 @@ JOBS=`nproc 2> /dev/null || echo 1`
 
 make -j $JOBS cores
 
-make NAME=led_blinker_77_76 all
+make NAME=led_blinker_122_88 all
 
-PRJS="sdr_receiver_77_76 sdr_receiver_ft8_77_76 sdr_receiver_hpsdr_77_76 sdr_receiver_wspr_77_76"
+PRJS="sdr_receiver_122_88 sdr_receiver_ft8_122_88 sdr_receiver_wspr_122_88"
 
 printf "%s\n" $PRJS | xargs -n 1 -P $JOBS -I {} make NAME={} bit
 

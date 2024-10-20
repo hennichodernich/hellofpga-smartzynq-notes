@@ -3,7 +3,11 @@ Notes on the HelloFPGA SmartZynq starter kit
 This is a fork from https://github.com/pavel-demin/qmtech-xc7z020-notes
 The original documentation can be found at https://pavel-demin.github.io/qmtech-xc7z020-notes/
 
-This fork contains for the time being only the sdr_receiver and sdr_receiver_ft8 projects.
+This fork contains:
+led_blinker
+sdr_receiver
+sdr_receiver_ft8
+sdr_receiver_wspr
 
 The ADC add-on board required for these projects can be found at https://github.com/hennichodernich/smartzynq-adc-addon
 
