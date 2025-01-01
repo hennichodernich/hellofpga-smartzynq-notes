@@ -60,7 +60,7 @@ ln -s /media/mmcblk0p1/cache $root_dir/etc/apk/cache
 cp -r alpine/etc $root_dir/
 cp -r alpine/apps $root_dir/media/mmcblk0p1/
 
-projects="common_tools led_blinker_122_88 sdr_receiver_122_88 sdr_receiver_ft8_122_88 sdr_receiver_wspr_122_88"
+projects="common_tools led_blinker_122_88 sdr_receiver_122_88 sdr_receiver_ft8_122_88 sdr_receiver_wspr_122_88 sdr_receiver_hpsdr_122_88"
 
 for p in $projects
 do
